@@ -31,10 +31,11 @@ void process_task(void *p) {
     int data = 0;
 
     // Estado do filtro: variáveis LOCAIS da task (nada de global, Rule 4.4)
+    // A janela começa com zeros: as 4 primeiras saídas já são impressas,
+    // como se houvesse amostras 0 antes do início do sinal.
     int janela[MEDIA_JANELA] = {0};  // últimas 5 amostras (buffer circular)
     int indice = 0;                  // posição da amostra MAIS ANTIGA
     int soma = 0;                    // soma das amostras dentro da janela
-    int amostras = 0;                // quantas amostras já chegaram (até 5)
 
     while (true) {
         if (xQueueReceive(xQueueData, &data, 100)) {
@@ -47,15 +48,8 @@ void process_task(void *p) {
             // Avança o índice circularmente: 0,1,2,3,4,0,1,...
             indice = (indice + 1) % MEDIA_JANELA;
 
-            if (amostras < MEDIA_JANELA) {
-                amostras++;
-            }
-
-            // Versão A: só imprime quando a janela está cheia.
-            // Para a versão B (imprimir desde a 1ª amostra), apague este if.
-            if (amostras == MEDIA_JANELA) {
-                printf("%d\n", soma / MEDIA_JANELA);  // divisão inteira
-            }
+            // Imprime a média a cada amostra (divisão inteira)
+            printf("%d\n", soma / MEDIA_JANELA);
 
             // deixar esse delay!
             vTaskDelay(pdMS_TO_TICKS(50));
