@@ -17,14 +17,12 @@ void adc_task(void *p) {
     // 12-bit conversion, assume max value == ADC_VREF == 3.3 V
     const float conversion_factor = 3.3f / (1 << 12);
 
-    uint16_t result;
     while (1) {
         adc_select_input(1); // Select ADC input 1 (GPIO27)
-        result = adc_read();
+        uint16_t result = adc_read();   // declarada no menor escopo (cppcheck variableScope)
         printf("voltage 1: %f V\n", result * conversion_factor);
 
-        // Mesmo padrão: selecionar o canal e depois ler.
-        // GP26 corresponde ao canal 0 do MUX (o número do pino não é o do canal).
+        // GP26 corresponde ao canal 0 do MUX (o número do pino não é o do canal)
         adc_select_input(0); // Select ADC input 0 (GPIO26)
         result = adc_read();
         printf("voltage 2: %f V\n", result * conversion_factor);
